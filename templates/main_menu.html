@@ -1,0 +1,80 @@
+{% extends "bootstrap/base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+{% from "_form_helpers.html" import render_field, flash_messages, show_errors %}
+
+{% block title %}Ah win de Trini Lotto{% endblock %}
+
+{% block styles %}
+{{super()}}
+<style>
+  .control-label {
+     display: none;
+     }
+  
+  input{
+     border-width: 1px;
+     border-color: lightgray;
+     margin-bottom:2px;
+     margin-top: 2px;
+     margin-left: auto;
+     padding: 1%;
+     }
+
+   .help-block{
+      display: none;
+      }
+
+   error-messages{
+      text-align: center;
+      margin-bottom: 0;
+      line-height: 50%;
+   }
+
+   img{
+      margin-top: 15px;
+      margin-bottom: 35px;
+   }
+</style>
+{% endblock %}
+
+{% block head %}
+   {{super()}}
+   <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico')}}">
+{% endblock %}
+
+{% block content %}
+<div class="text-center col-xs-12 col-md-12 ">
+   <img src="/static/LottoPlus.png" class="img-fluid" alt="LottoPlus">         
+</div>
+
+<div class="container pt-1">
+   <form method="POST" role="form">
+      {{form.csrf_token}}
+
+
+      {{ render_field(form.draw_no, '', "Draw #", 12, form) }}
+      {{ render_field(form.n1, coloring[0], "i", 2, form) }}
+      {{ render_field(form.n2, coloring[1], "ii", 2, form) }}
+      {{ render_field(form.n3, coloring[2], "iii", 2, form) }}
+      {{ render_field(form.n4, coloring[3], "iv", 2, form) }}
+      {{ render_field(form.n5, coloring[4], "v", 2, form) }}
+      {{ render_field(form.power_ball, coloring[5], "pb", 2, form) }}
+      {{ show_errors(form) }}
+      {{ flash_messages() }}
+      
+      <div>
+         <p class="text-center">_</p>
+         {{form.submit(class="col-xs-12 col-md-12 btn btn-primary") }}
+         {% if no_errors %}
+            <a href="#demo" class="col-xs-12 col-md-12 btn btn-info" data-toggle="collapse">Lotto Titbits</a>
+            <div id="demo" class="collapse text-center">
+            Brought to you by <a href="{{adv_link}}">{{advertiser}}</a><br>
+            <i>{{adv_slogan}}</i>
+            <br>
+            {{titbit}}
+            </div>
+         {% endif %}
+      </div>
+   </form>
+</div>
+{% endblock %}

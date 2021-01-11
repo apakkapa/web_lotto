@@ -1,0 +1,26 @@
+{% import "bootstrap/wtf.html" as wtf %}
+{% macro render_field(fieldname, class_no, placeholder, col_2_or_12=2, form=form) %}
+        {{
+            wtf.form_field(
+            fieldname,
+            class="input-lg col-xs-{} col-md-{} text-center {}".format( col_2_or_12,  col_2_or_12, class_no),
+            placeholder="{}".format(placeholder)
+            )
+        }}
+{% endmacro %}
+
+{% macro flash_messages() %}
+    <div class="flashes">
+        {% for message in get_flashed_messages() %}
+            <p class="text-center">{{message|safe}}</p>
+        {% endfor %}
+    </div>
+{% endmacro %}
+
+{% macro show_errors(form) %}
+    {% for field, errors in form.errors.items() %}
+        {% for error in errors %}
+            <p class="text-danger text-center">{{field}}: <i>{{error}}</i></p>
+        {% endfor %}
+    {% endfor %}
+{% endmacro %}

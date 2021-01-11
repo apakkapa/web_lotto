@@ -1,0 +1,4 @@
+sqlite3 lotto_number.db << KAP
+    update lotto_numbers set draw_estimate = 6800000 where draw_no=2003;
+KAP
+    

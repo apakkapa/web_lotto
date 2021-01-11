@@ -1,0 +1,11 @@
+{
+    "python.pythonPath": "venv/bin/python",
+    "sqltools.connections": [
+        {
+            "database": "${workspaceFolder:web_lotto}/lotto_number.db",
+            "driver": "SQLite",
+            "name": "lotto",
+            "previewLimit": 50
+        }
+    ]
+}
