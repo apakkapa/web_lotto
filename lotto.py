@@ -1,4 +1,3 @@
-from socket import gethostname
 from flask import Flask, render_template, request, flash, url_for, Markup
 
 from flask_sqlalchemy import SQLAlchemy
@@ -39,26 +38,26 @@ COMPANIES = {
 TITBITS = {
     0: 'select draw_date, draw_winners, max(draw_estimate) from lotto_numbers',
     1: """
-        SELECT
-            sum(draw_winners),
-            sum(draw_estimate)
+        SELECT 
+            sum(draw_winners), 
+            sum(draw_estimate) 
         FROM
-            lotto_numbers
+            lotto_numbers 
         where
-            draw_winners>0 order by  draw_estimate desc
+            draw_winners>0 order by  draw_estimate desc    
         """,
     2: """
-        select ball, count(ball) from (select ball_1 as ball from lotto_numbers
+        select ball, count(ball) from (select ball_1 as ball from lotto_numbers 
         UNION ALL
-        select ball_2 as ball from lotto_numbers
+        select ball_2 as ball from lotto_numbers 
         UNION ALL
-        select ball_3 as ball from lotto_numbers
+        select ball_3 as ball from lotto_numbers 
         UNION ALL
-        select ball_4 as ball from lotto_numbers
+        select ball_4 as ball from lotto_numbers 
         UNION ALL
         select ball_5 as ball from lotto_numbers) as balls
-        GROUP BY ball
-        order by  count(ball)
+        GROUP BY ball 
+        order by  count(ball) 
         """,
     3: 'You won',
     4: 'We even'
@@ -71,8 +70,8 @@ app.config['SECRET_KEY'] = '124&secret@l%1**10!@#floatsia((7&5^'
 Bootstrap(app)
 db = SQLAlchemy(app)
 logging.basicConfig(
-    filename='lotto.log',
-    level=logging.DEBUG,
+    filename='lotto.log', 
+    level=logging.DEBUG, 
     format='%(asctime)s %(levelname)s %(name)s %(threadName)s : %(message)s')
 
 
@@ -88,18 +87,18 @@ class LottoNumbers(db.Model):
     ball_4 = db.Column(db.Integer)
     ball_5 = db.Column(db.Integer)
     ball_6 = db.Column(db.Integer)  #powerball
-
+    
     def __repr__(self):
         pass
-
+    
     @classmethod
     def titbit(cls, no):
         pass
-
+    
     @classmethod
     def get_draw_numbers(cls, draw_no):
         pass
-
+    
     @classmethod
     def scrape_data_from_url(cls, url, draw_no):
         draw_date, balls, power_ball, jackpot, no_of_winners = None,  [], None, 0, 0
@@ -141,7 +140,7 @@ class LottoNumbers(db.Model):
                 jackpot = 0
 
         return (draw_no, draw_date, balls, power_ball, jackpot, no_of_winners)
-
+    
     @classmethod
     def add_data_to_db(cls, draw_no, draw_date, balls, power_ball, jackpot, no_of_winners):
         pass
@@ -166,10 +165,10 @@ class UsersPick(FlaskForm):
         else:
             self.draw_no.errors.append("Numbers cannot be duplicated")
             return False
-
-
+            
+    
     def numbers_match(self, db_nos, numbers_entered):
-        return db_nos.intersection(numbers_entered)
+        return db_nos.intersection(numbers_entered) 
 
     def check_nos(self, db_nos):
         db_nos_set = {x for x in db_nos}
@@ -190,13 +189,13 @@ def main_menu():
 
     form = UsersPick()
     class_colors = ['', '', '', '', '', '']
-    if form.validate_on_submit():
+    if form.validate_on_submit(): 
         # check draw for numbers in database
         # if not found check for number on web and add numbers to database
         # if not found on web then display draw not available
-        # display nos
-        #
-        #
+        # display nos 
+        # 
+        #     
         #db_nos = LottoNumbers.get_draw_numbers(form.draw_no.data)
         s = LottoNumbers.query.filter_by(draw_no=form.draw_no.data).first()
         if not s: #try scaping the web
@@ -204,15 +203,15 @@ def main_menu():
             draw_no, draw_date, balls, power_ball, jackpot, no_of_winners = LottoNumbers.scrape_data_from_url(url, form.draw_no.data)
             if draw_no is not None:
                 s = LottoNumbers(
-                    draw_no=draw_no,
-                    draw_date=draw_date,
+                    draw_no=draw_no, 
+                    draw_date=draw_date, 
                     ball_1=balls[0],
                     ball_2=balls[1],
                     ball_3=balls[2],
                     ball_4=balls[3],
                     ball_5=balls[4],
                     ball_6= power_ball,
-                    draw_estimate=jackpot,
+                    draw_estimate=jackpot, 
                     draw_winners=no_of_winners
                     )
                 db.session.add(s)
@@ -230,40 +229,40 @@ def main_menu():
             class_colors[3] = DISP_COLORS[form.n4.data in db_nos]
             class_colors[4] = DISP_COLORS[form.n5.data in db_nos]
             class_colors[5] = DISP_COLORS[form.power_ball.data == s.ball_6]
-
+            
             msg = ''
             winning_key = (l_nos, form.power_ball.data == s.ball_6)
             if winning_key in WINNINGS.keys():
                 msg = f'You won {WINNINGS[winning_key]}!'
                 if winning_key == (5, True):
                     msg = f'{msg}, estimated at ${s.draw_estimate:,.2f}'
-
+            
             msg = f'{msg}<br>You got <b>{l_nos}</b> {pluralize("number", l_nos)}'
             if form.power_ball.data == s.ball_6:
                 msg = f'{msg} <i>{and_or_but(l_nos)}</i> you got the <b>powerball</b>'
             msg = f'{msg}.<br>The numbers for draw #<b>{form.draw_no.data}</b> are <b>{db_nos}</b><br>The powerball is <b>{s.ball_6}</b>'
             msg = f'{msg}. The jackpot was {s.draw_estimate}. There were {s.draw_winners} winners'
         else:
-            msg = f'Draw #<b>{form.draw_no.data}</b> not found!'
-
+            msg = f'Draw #<b>{form.draw_no.data}</b> not found!' 
+         
         flash(Markup(msg))
 
     if request.method == 'POST':
-        app.logger.info(f'{request.remote_addr} {request.headers["X-Real-IP"]} - Draw #:{form.draw_no.data} {form.n1.data} {form.n2.data} {form.n3.data} {form.n4.data} {form.n5.data} P{form.power_ball.data}')
-
+        app.logger.info(f'{request.remote_addr} - Draw #:{form.draw_no.data} {form.n1.data} {form.n2.data} {form.n3.data} {form.n4.data} {form.n5.data} P{form.power_ball.data}')
+    
     ad_no = random.randint(0, len(COMPANIES)-1)
     tit_no = random.randint(0, len(TITBITS)-1)
 
     advertiser = COMPANIES[ad_no][0]
     titbit = TITBITS[tit_no]
     return render_template(
-        'main_menu.html',
-        form=form,
-        coloring=class_colors,
-        advertiser=advertiser,
+        'main_menu.html', 
+        form=form, 
+        coloring=class_colors, 
+        advertiser=advertiser, 
         adv_link = COMPANIES[ad_no][2],
         adv_slogan = COMPANIES[ad_no][1],
-        titbit=titbit,
+        titbit=titbit, 
         no_errors=(request.method == 'POST'))
 
 
@@ -271,3 +270,4 @@ if __name__ == '__main__':
     db.create_all()
     if 'liveconsole' not in gethostname():
         app.run()
+    pip
